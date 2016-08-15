@@ -1,6 +1,6 @@
 /*
  * tiger-192 djm34
- * 
+ *
  */
 
 /*
@@ -9,7 +9,7 @@
  * ==========================(LICENSE BEGIN)============================
  *
  * Copyright (c) 2014  djm34
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -17,10 +17,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -600,7 +600,7 @@ static const uint64_t cpu_T4[256] = {
 		ROUND(c, a, b, X5, mul); \
 		ROUND(a, b, c, X6, mul); \
 		ROUND(b, c, a, X7, mul); \
-	} 
+	}
 
 #define MUL5(x)   SPH_T64((x) * SPH_C64(5))
 #define MUL7(x)   SPH_T64((x) * SPH_C64(7))
@@ -628,7 +628,7 @@ static const uint64_t cpu_T4[256] = {
 		X5 ^= X4; \
 		X6 = SPH_T64(X6 + X5); \
 		X7 = SPH_T64(X7 - (X6 ^ SPH_C64(0x0123456789ABCDEF))); \
-	} 
+	}
 
 #define TIGER_ROUND_BODY(in, r)    { \
 		uint64_t A, B, C; \
@@ -655,12 +655,12 @@ static const uint64_t cpu_T4[256] = {
 		(r)[0] ^= A; \
 		(r)[1] = SPH_T64(B - (r)[1]); \
 		(r)[2] = SPH_T64(C + (r)[2]); \
-	} 
+	}
 
 
 __global__ void m7_tiger192_gpu_hash_120(int threads, uint32_t startNounce, uint64_t *outputHash)
 {
-	
+
 	 __shared__ uint64_t sharedMem[1024];
 	if(threadIdx.x < 256)
 	{
@@ -673,13 +673,13 @@ __global__ void m7_tiger192_gpu_hash_120(int threads, uint32_t startNounce, uint
     int thread = (blockDim.x * blockIdx.x + threadIdx.x);
     if (thread < threads)
     {
-        
+
         uint32_t nounce = startNounce + thread;
 union {
 uint8_t h1[64];
 uint32_t h4[16];
 uint64_t h8[8];
-} hash;  
+} hash;
 /*
 #undef MUL5
 #undef MUL7
@@ -697,18 +697,19 @@ uint64_t h8[8];
 		ROUND(c, a, b, X5, mul); \
 		ROUND(a, b, c, X6, mul); \
 		ROUND(b, c, a, X7, mul); \
-	} 
+	}
 
 
+#define BYTE(x, n) __byte_perm(((uint32_t*)&(x))[(n) / 4], 0, 0x4440 + ((n) % 4))
 
 #define ROUND(a, b, c, x, mul)    { \
 		c ^= x; \
-		a = SPH_T64(a - (sharedMem[c & 0xFF] ^ sharedMem[((c >> 16) & 0xFF)+256] \
-			      ^ sharedMem[((c >> 32) & 0xFF)+512] ^ sharedMem[((c >> 48) & 0xFF)+768])); \
-		b = SPH_T64(b + (sharedMem[((c >> 8) & 0xFF)+768] ^ sharedMem[((c >> 24) & 0xFF)+512] \
-			^ sharedMem[((c >> 40) & 0xFF)+256] ^ sharedMem[(c >> 56) & 0xFF])); \
+		a = SPH_T64(a - (sharedMem[BYTE(c, 0)] ^ sharedMem[BYTE(c, 2)+256] \
+			      ^ sharedMem[BYTE(c, 4)+512] ^ sharedMem[BYTE(c, 6)+768])); \
+		b = SPH_T64(b + (sharedMem[BYTE(c, 1)+768] ^ sharedMem[BYTE(c, 3)+512] \
+			^ sharedMem[BYTE(c, 5)+256] ^ sharedMem[BYTE(c, 7)])); \
 		b = mul(b); \
-	} 
+	}
 
 
         uint64_t in[8],buf[3];
@@ -730,7 +731,7 @@ uint64_t h8[8];
 		 TIGER_ROUND_BODY(in3, buf);
 
 #pragma unroll 3
-for (int i=0;i<3;i++) {outputHash[i*threads+thread]=buf[i];} 
+for (int i=0;i<3;i++) {outputHash[i*threads+thread]=buf[i];}
  } //// threads
 }
 
@@ -744,7 +745,7 @@ void tiger192_cpu_init(int thr_id, int threads)
 	cudaMemcpyToSymbol(T2,cpu_T2,sizeof(cpu_T2),0, cudaMemcpyHostToDevice);
 	cudaMemcpyToSymbol(T3,cpu_T3,sizeof(cpu_T3),0, cudaMemcpyHostToDevice);
 	cudaMemcpyToSymbol(T4,cpu_T4,sizeof(cpu_T4),0, cudaMemcpyHostToDevice);
-	
+
 
 
 }
@@ -771,7 +772,7 @@ __host__ void tiger192_setBlock_120(void *pdata)
 	unsigned char PaddedMessage[128];
 	uint8_t ending =0x01;
 	memcpy(PaddedMessage, pdata, 122);
-	memset(PaddedMessage+122,ending,1); 
+	memset(PaddedMessage+122,ending,1);
 	memset(PaddedMessage+123, 0, 5); //useless
 	cudaMemcpyToSymbol( c_PaddedMessage80, PaddedMessage, 16*sizeof(uint64_t), 0, cudaMemcpyHostToDevice);
 
@@ -798,7 +799,7 @@ __host__ void tiger192_setBlock_120(void *pdata)
 		for (int i=0;i<8;i++) {in[i]= alt_data[i];}
 		for (int i=0;i<3;i++) {buf[i]=III[i];}
 
-		 TIGER_ROUND_BODY(in, buf)   
+		 TIGER_ROUND_BODY(in, buf)
 	cudaMemcpyToSymbol( bufo, buf, 3*sizeof(uint64_t), 0, cudaMemcpyHostToDevice);
 
 

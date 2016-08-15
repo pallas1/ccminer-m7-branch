@@ -1,6 +1,6 @@
 /*
  * tiger-192 djm34
- * 
+ *
  */
 
 /*
@@ -9,7 +9,7 @@
  * ==========================(LICENSE BEGIN)============================
  *
  * Copyright (c) 2014  djm34
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -17,10 +17,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -66,9 +66,9 @@ static __forceinline__ __device__ void mul_unroll1_core_test(int threads, int th
 
 #pragma unroll
 	for (int i = 0; i<35; i++) { w[i*threads + thread] = 0; }
-#if __CUDA_ARCH__ < 500
-#pragma unroll    
-#endif
+//#if __CUDA_ARCH__ < 500
+#pragma unroll 2
+//#endif
 	for (int i = 0; i<32; i++) {
 		uint32_t Q0;
 		uint32_t Q1;
@@ -164,9 +164,9 @@ static __forceinline__ __device__ void mul_unroll2_core_test(int threads, int th
 
 #pragma unroll
 	for (int i = 0; i<38; i++) { w[i*threads + thread] = 0; }
-#if __CUDA_ARCH__ < 500
-#pragma unroll    
-#endif
+//#if __CUDA_ARCH__ < 500
+#pragma unroll 2
+//#endif
 	for (int i = 0; i<35; i++) {
 		uint32_t Q0;
 		uint32_t Q1;

@@ -1,6 +1,6 @@
 /*
  * sha256 djm34, catia
- * 
+ *
  */
 
 /*
@@ -9,7 +9,7 @@
  * ==========================(LICENSE BEGIN)============================
  *
  * Copyright (c) 2014  djm34
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -17,10 +17,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -57,8 +57,8 @@ typedef struct t4_t{
 	uint64_t high,low;
 } t4_t;
 
-__device__ __forceinline__ 
-ulonglong2 umul64wide (unsigned long long int a, 
+__device__ __forceinline__
+ulonglong2 umul64wide (unsigned long long int a,
                        unsigned long long int b)
 {
     ulonglong2 res;
@@ -75,7 +75,7 @@ ulonglong2 umul64wide (unsigned long long int a,
          "madc.hi.u32     r3, ahi, bhi,  0;\n\t"
          "mad.lo.cc.u32   r2, ahi, bhi, r2;\n\t"
          "addc.u32        r3, r3,  0;      \n\t"
-         "mov.b64         %0, {r0,r1};     \n\t"  
+         "mov.b64         %0, {r0,r1};     \n\t"
          "mov.b64         %1, {r2,r3};     \n\t"
          "}"
          : "=l"(res.x), "=l"(res.y)
@@ -198,7 +198,7 @@ __device__ __forceinline__ t4_t T4(uint32_t thread, uint32_t threads, uint32_t i
 	ret.high = g[(idx*2 + 1)*threads + thread];
 	ret.low = g[(idx*2)*threads + thread];
 
-	
+
 
 	return ret;
 }
@@ -207,7 +207,7 @@ __device__ __forceinline__ void T4_store(uint32_t thread, uint32_t threads, uint
 	g[(idx*2 + 1)*threads + thread]=val.high;
 	g[(idx*2)*threads + thread]=val.low;
 
-	
+
 
 }
 
@@ -297,7 +297,7 @@ uint64_t __device__ addmul_1g (uint32_t thread, uint32_t threads, uint64_t *sum,
 	uint64_t ul,lpl,hpl,rl;
 
 	for(i=0; i < xsz; i++){
-		
+
       		ul = x[i*threads + thread];
       		umul_ppmm (hpl, lpl, ul, a);
 
@@ -319,7 +319,7 @@ t4_t __device__ addmul_1gT4 (uint32_t thread, uint32_t threads, uint64_t *sum, u
 	t4_t ul,lpl,hpl,rl;
 	T4_set(&carry,0);
 	for(i=0; i < xsz; i++){
-		
+
       		ul = T4(thread,threads,i,x);
       		umul_ppmmT4 (&hpl, &lpl, ul, a);
 
@@ -353,7 +353,7 @@ __global__ void gpu_mul(int threads, uint32_t ulegs, uint32_t vlegs, uint64_t *g
 	}
 
 	uint32_t vofst=1,rofst=1,psize=0;
-	mulScalar(thread,threads,ulegs,g_p,g_u,g_v[thread],&psize);   
+	mulScalar(thread,threads,ulegs,g_p,g_u,g_v[thread],&psize);
 
 #if 1
 
@@ -380,9 +380,9 @@ __global__ void  gpu_mulT4(int threads, uint32_t ulegs, uint32_t vlegs, uint64_t
     if (thread < threads)
     {
 
-	if(ulegs < vlegs){  
+	if(ulegs < vlegs){
 		uint64_t t1=ulegs;
-		ulegs = vlegs;   
+		ulegs = vlegs;
 		vlegs = t1;
 
 		uint64_t *t2 = g_u;
@@ -392,7 +392,7 @@ __global__ void  gpu_mulT4(int threads, uint32_t ulegs, uint32_t vlegs, uint64_t
 
 	ulegs >>= 1; vlegs >>= 1;
 
-	
+
 
 	uint32_t vofst=1,rofst=1,psize=0;
 	mulScalarT4(thread,threads,ulegs,g_p,g_u,T4(thread,threads,0,g_v),&psize);
@@ -400,10 +400,10 @@ __global__ void  gpu_mulT4(int threads, uint32_t ulegs, uint32_t vlegs, uint64_t
 #if 1
 	t4_t zero;
 	T4_set(&zero,0);
-	
+
 
 #pragma unroll
-	    for (vofst=1;vofst<vlegs;vofst++) {  
+	    for (vofst=1;vofst<vlegs;vofst++) {
 	    	T4_store(thread,threads,psize,g_p,zero);
 
             	T4_store(thread,threads,ulegs+rofst,g_p,addmul_1gT4 (thread, threads, g_p ,rofst , g_u, ulegs,T4(thread,threads,vofst,g_v)));
@@ -419,9 +419,9 @@ __global__ void  gpu_mulT4(int threads, uint32_t ulegs, uint32_t vlegs, uint64_t
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, char *file, int line, bool abort=true)
 {
-   if (code != cudaSuccess) 
+   if (code != cudaSuccess)
    {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      //fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
       if (abort) exit(code);
    }
 }
@@ -444,13 +444,13 @@ __host__ void cpu_mul(int thr_id, int threads, uint32_t alegs, uint32_t blegs, u
 __host__ void cpu_mulT4(int thr_id, int threads, uint32_t alegs, uint32_t blegs, uint64_t *g_a, uint64_t *g_b, uint64_t *g_p, int order)
 {
 
-	const int threadsperblock = 256; 
+	const int threadsperblock = 256;
 
 	dim3 grid(2*(threads + threadsperblock-1)/threadsperblock);
 	dim3 block(threadsperblock);
 
 	size_t shared_size =0;
-  	
+
 	gpu_mulT4<<<grid, block, shared_size>>>(threads, blegs, alegs, g_b, g_a, g_p) ;
 }
 

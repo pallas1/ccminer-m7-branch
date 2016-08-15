@@ -3,7 +3,7 @@ AC_INIT([ccminer], [2014.06.15])
 AC_PREREQ([2.59c])
 AC_CANONICAL_SYSTEM
 AC_CONFIG_SRCDIR([cpu-miner.c])
-AM_INIT_AUTOMAKE([gnu])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_HEADERS([cpuminer-config.h])
 
 dnl Make sure anyone changing configure.ac/Makefile.am has a clue
@@ -160,6 +160,6 @@ AC_SUBST(CUDA_LIBS)
 AC_SUBST(CUDA_LDFLAGS)
 AC_SUBST(NVCC)
 
-AC_SUBST(OPENMP_CFLAGS) 
+AC_SUBST(OPENMP_CFLAGS)
 
 AC_OUTPUT
