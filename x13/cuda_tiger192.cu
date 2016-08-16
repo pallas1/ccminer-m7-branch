@@ -58,7 +58,7 @@ extern cudaError_t MyStreamSynchronize(cudaStream_t stream, int situation, int t
 
  __constant__ uint64_t c_PaddedMessage80[16]; // padded message (80 bytes + padding)
  __constant__ uint64_t bufo[3];
-static __constant__ uint64_t gpu_III[3];
+//static __constant__ uint64_t gpu_III[3];
 static __constant__ uint64_t T1[256];
 static __constant__ uint64_t T2[256];
 static __constant__ uint64_t T3[256];
@@ -739,7 +739,7 @@ for (int i=0;i<3;i++) {outputHash[i*threads+thread]=buf[i];}
 void tiger192_cpu_init(int thr_id, int threads)
 {
 
-    cudaMemcpyToSymbol(gpu_III,III,sizeof(III),0, cudaMemcpyHostToDevice);
+//	cudaMemcpyToSymbol(gpu_III,III,sizeof(III),0, cudaMemcpyHostToDevice);
 
 	cudaMemcpyToSymbol(T1,cpu_T1,sizeof(cpu_T1),0, cudaMemcpyHostToDevice);
 	cudaMemcpyToSymbol(T2,cpu_T2,sizeof(cpu_T2),0, cudaMemcpyHostToDevice);

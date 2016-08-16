@@ -1,6 +1,6 @@
 /*
  * Haval-512
- * 
+ *
  * Built on cbuchner1's implementation, actual hashing code
  * heavily based on phm's sgminer
  *
@@ -12,7 +12,7 @@
  * ==========================(LICENSE BEGIN)============================
  *
  * Copyright (c) 2014  djm34
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
  * "Software"), to deal in the Software without restriction, including
@@ -20,10 +20,10 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -60,7 +60,16 @@
 extern cudaError_t MyStreamSynchronize(cudaStream_t stream, int situation, int thr_id);
 
 __constant__ uint32_t c_PaddedMessage80[32];
-static __constant__ uint32_t initVector[8];
+static __constant__ const uint32_t initVector[8] = {
+	SPH_C32(0x243F6A88),
+	SPH_C32(0x85A308D3),
+	SPH_C32(0x13198A2E),
+	SPH_C32(0x03707344),
+	SPH_C32(0xA4093822),
+	SPH_C32(0x299F31D0),
+	SPH_C32(0x082EFA98),
+	SPH_C32(0xEC4E6C89)
+};
 
 static const uint32_t c_initVector[8] = {
 	SPH_C32(0x243F6A88),
@@ -109,7 +118,7 @@ static const uint32_t c_initVector[8] = {
    STEP(n, 1, s2, s1, s0, s7, s6, s5, s4, s3, in[29], SPH_C32(0x00000000)); \
    STEP(n, 1, s1, s0, s7, s6, s5, s4, s3, s2, in[30], SPH_C32(0x00000000)); \
    STEP(n, 1, s0, s7, s6, s5, s4, s3, s2, s1, in[31], SPH_C32(0x00000000)); \
-	} 
+	}
 
 #define PASS2(n, in)    { \
    STEP(n, 2, s7, s6, s5, s4, s3, s2, s1, s0, in[ 5], SPH_C32(0x452821E6)); \
@@ -147,7 +156,7 @@ static const uint32_t c_initVector[8] = {
    STEP(n, 2, s2, s1, s0, s7, s6, s5, s4, s3, in[25], SPH_C32(0x82154AEE)); \
    STEP(n, 2, s1, s0, s7, s6, s5, s4, s3, s2, in[31], SPH_C32(0x7B54A41D)); \
    STEP(n, 2, s0, s7, s6, s5, s4, s3, s2, s1, in[27], SPH_C32(0xC25A59B5)); \
-	} 
+	}
 
 #define PASS3(n, in)    { \
    STEP(n, 3, s7, s6, s5, s4, s3, s2, s1, s0, in[19], SPH_C32(0x9C30D539)); \
@@ -185,7 +194,7 @@ static const uint32_t c_initVector[8] = {
    STEP(n, 3, s2, s1, s0, s7, s6, s5, s4, s3, in[11], SPH_C32(0x9B87931E)); \
    STEP(n, 3, s1, s0, s7, s6, s5, s4, s3, s2, in[ 5], SPH_C32(0xAFD6BA33)); \
    STEP(n, 3, s0, s7, s6, s5, s4, s3, s2, s1, in[ 2], SPH_C32(0x6C24CF5C)); \
-	} 
+	}
 
 #define PASS4(n, in)  { \
    STEP(n, 4, s7, s6, s5, s4, s3, s2, s1, s0, in[24], SPH_C32(0x7A325381)); \
@@ -261,7 +270,7 @@ static const uint32_t c_initVector[8] = {
    STEP(n, 5, s2, s1, s0, s7, s6, s5, s4, s3, in[ 1], SPH_C32(0x04C006BA)); \
    STEP(n, 5, s1, s0, s7, s6, s5, s4, s3, s2, in[25], SPH_C32(0xC1A94FB6)); \
    STEP(n, 5, s0, s7, s6, s5, s4, s3, s2, s1, in[15], SPH_C32(0x409F60C4)); \
-	} 
+	}
 
 #define F1(x6, x5, x4, x3, x2, x1, x0) \
 	(((x1) & ((x0) ^ (x4))) ^ ((x2) & (x5)) ^ ((x3) & (x6)) ^ (x0))
@@ -302,25 +311,25 @@ static const uint32_t c_initVector[8] = {
 		uint32_t t = FP ## n ## _ ## p(x6, x5, x4, x3, x2, x1, x0); \
 		(x7) = SPH_T32(SPH_ROTR32(t, 7) + SPH_ROTR32((x7), 11) \
 			+ (w) + (c)); \
-	} 
+	}
 
 __global__ void m7_haval256_gpu_hash_120(int threads, uint32_t startNounce, uint64_t *outputHash)
 {
-	
+
 
     int thread = (blockDim.x * blockIdx.x + threadIdx.x);
     if (thread < threads)
     {
-        
+
 		uint32_t nounce = startNounce + thread;
-			
+
 union {
 uint32_t h4[16];
 uint64_t h8[8];
-} hash;  
+} hash;
 
-		
-	uint32_t u0, u1, u2, u3, u4, u5, u6, u7; 
+
+	uint32_t u0, u1, u2, u3, u4, u5, u6, u7;
 	uint32_t s0,s1,s2,s3,s4,s5,s6,s7;
 	uint32_t buf[32];
 	s0 = initVector[0];
@@ -332,89 +341,89 @@ uint64_t h8[8];
 	s6 = initVector[6];
 	s7 = initVector[7];
 
-		u0 = s0; 
-		u1 = s1; 
-		u2 = s2; 
-		u3 = s3; 
-		u4 = s4; 
-		u5 = s5; 
-		u6 = s6; 
-		u7 = s7; 		
-///////// input big /////////////////////        
+		u0 = s0;
+		u1 = s1;
+		u2 = s2;
+		u3 = s3;
+		u4 = s4;
+		u5 = s5;
+		u6 = s6;
+		u7 = s7;
+///////// input big /////////////////////
 #pragma unroll 29
 		for (int i=0;i<29;i++) {
-			buf[i]=c_PaddedMessage80[i];} 
+			buf[i]=c_PaddedMessage80[i];}
 			buf[29]=nounce;
 			buf[30]=c_PaddedMessage80[30]+0x00010000;  //need to fix that
 			buf[31]=0;
-			
-			PASS1(5, buf); 
-		    PASS2(5, buf); 
-		    PASS3(5, buf); 
-		    PASS4(5, buf); 
-		    PASS5(5, buf); 
-		   
 
-		    s0 = sph_t32(s0 + u0); 
-		    s1 = sph_t32(s1 + u1); 
-		    s2 = sph_t32(s2 + u2); 
-		    s3 = sph_t32(s3 + u3); 
-		    s4 = sph_t32(s4 + u4); 
-		    s5 = sph_t32(s5 + u5); 
-		    s6 = sph_t32(s6 + u6); 
-		    s7 = sph_t32(s7 + u7); 
-		    u0 = s0; 
-		    u1 = s1; 
-		    u2 = s2; 
-		    u3 = s3; 
-		    u4 = s4; 
-	     	u5 = s5; 
-	 	    u6 = s6; 
-	    	u7 = s7; 
+			PASS1(5, buf);
+		    PASS2(5, buf);
+		    PASS3(5, buf);
+		    PASS4(5, buf);
+		    PASS5(5, buf);
 
-            
+
+		    s0 = sph_t32(s0 + u0);
+		    s1 = sph_t32(s1 + u1);
+		    s2 = sph_t32(s2 + u2);
+		    s3 = sph_t32(s3 + u3);
+		    s4 = sph_t32(s4 + u4);
+		    s5 = sph_t32(s5 + u5);
+		    s6 = sph_t32(s6 + u6);
+		    s7 = sph_t32(s7 + u7);
+		    u0 = s0;
+		    u1 = s1;
+		    u2 = s2;
+		    u3 = s3;
+		    u4 = s4;
+	     	u5 = s5;
+	 	    u6 = s6;
+	    	u7 = s7;
+
+
 /////////////////////
 #pragma unroll 32
 		for (int i=0;i<32;i++) {buf[i]=0;}
-		    
+
 			buf[29]=0x40290000;
 			buf[30]=0x000003d0;
 
-			
 
-			PASS1(5, buf); 
-		    PASS2(5, buf); 
-		    PASS3(5, buf); 
-		    PASS4(5, buf); 
-		    PASS5(5, buf); 
-		   
-			
-		    s0 = sph_t32(s0 + u0); 
-		    s1 = sph_t32(s1 + u1); 
-		    s2 = sph_t32(s2 + u2); 
-		    s3 = sph_t32(s3 + u3); 
-		    s4 = sph_t32(s4 + u4); 
-		    s5 = sph_t32(s5 + u5); 
-		    s6 = sph_t32(s6 + u6); 
-		    s7 = sph_t32(s7 + u7); 
+
+			PASS1(5, buf);
+		    PASS2(5, buf);
+		    PASS3(5, buf);
+		    PASS4(5, buf);
+		    PASS5(5, buf);
+
+
+		    s0 = sph_t32(s0 + u0);
+		    s1 = sph_t32(s1 + u1);
+		    s2 = sph_t32(s2 + u2);
+		    s3 = sph_t32(s3 + u3);
+		    s4 = sph_t32(s4 + u4);
+		    s5 = sph_t32(s5 + u5);
+		    s6 = sph_t32(s6 + u6);
+		    s7 = sph_t32(s7 + u7);
 ////////////////////
 	        hash.h4[0]=s0;
             hash.h4[1]=s1;
 	        hash.h4[2]=s2;
             hash.h4[3]=s3;
 	        hash.h4[4]=s4;
-            hash.h4[5]=s5;  
+            hash.h4[5]=s5;
 	        hash.h4[6]=s6;
             hash.h4[7]=s7;
 
 #pragma unroll 4
-for (int i=0;i<4;i++) {outputHash[i*threads+thread]=hash.h8[i];} 
+for (int i=0;i<4;i++) {outputHash[i*threads+thread]=hash.h8[i];}
  } // threads
 }
 
 __global__ void haval256_gpu_hash_64(int threads, uint32_t startNounce, uint64_t *g_hash, uint32_t *g_nonceVector)
 {
-	
+
 
     int thread = (blockDim.x * blockIdx.x + threadIdx.x);
     if (thread < threads)
@@ -425,16 +434,16 @@ __global__ void haval256_gpu_hash_64(int threads, uint32_t startNounce, uint64_t
 
 
         uint32_t *inpHash = (uint32_t*)&g_hash[8 * hashPosition];
-		
-			
+
+
 union {
 uint8_t h1[64];
 uint32_t h4[16];
 uint64_t h8[8];
-} hash;  
+} hash;
 
-		
-	uint32_t u0, u1, u2, u3, u4, u5, u6, u7; 
+
+	uint32_t u0, u1, u2, u3, u4, u5, u6, u7;
 	uint32_t s0,s1,s2,s3,s4,s5,s6,s7;
 	uint32_t buf[32];
 	s0 = initVector[0];
@@ -446,21 +455,21 @@ uint64_t h8[8];
 	s6 = initVector[6];
 	s7 = initVector[7];
 
-		u0 = s0; 
-		u1 = s1; 
-		u2 = s2; 
-		u3 = s3; 
-		u4 = s4; 
-		u5 = s5; 
-		u6 = s6; 
-		u7 = s7; 
-	
-        
+		u0 = s0;
+		u1 = s1;
+		u2 = s2;
+		u3 = s3;
+		u4 = s4;
+		u5 = s5;
+		u6 = s6;
+		u7 = s7;
+
+
 	    #pragma unroll 16
 		for (int i=0;i<16;i++) {
 			hash.h4[i]= inpHash[i];}
-		
-///////// input big /////////////////////        
+
+///////// input big /////////////////////
 #pragma unroll 32
 		for (int i=0;i<32;i++) {
 			if (i<16) {buf[i]=hash.h4[i];} else {
@@ -468,22 +477,22 @@ uint64_t h8[8];
 		    buf[16]=0x00000001;
 			buf[29]=0x40290000;
 			buf[30]=0x00000200;
-			
-			PASS1(5, buf); 
-		    PASS2(5, buf); 
-		    PASS3(5, buf); 
-		    PASS4(5, buf); 
-		    PASS5(5, buf); 
-		   
 
-		    s0 = sph_t32(s0 + u0); 
-		    s1 = sph_t32(s1 + u1); 
-		    s2 = sph_t32(s2 + u2); 
-		    s3 = sph_t32(s3 + u3); 
-		    s4 = sph_t32(s4 + u4); 
-		    s5 = sph_t32(s5 + u5); 
-		    s6 = sph_t32(s6 + u6); 
-		    s7 = sph_t32(s7 + u7); 
+			PASS1(5, buf);
+		    PASS2(5, buf);
+		    PASS3(5, buf);
+		    PASS4(5, buf);
+		    PASS5(5, buf);
+
+
+		    s0 = sph_t32(s0 + u0);
+		    s1 = sph_t32(s1 + u1);
+		    s2 = sph_t32(s2 + u2);
+		    s3 = sph_t32(s3 + u3);
+		    s4 = sph_t32(s4 + u4);
+		    s5 = sph_t32(s5 + u5);
+		    s6 = sph_t32(s6 + u6);
+		    s7 = sph_t32(s7 + u7);
 
 	        hash.h4[0]=s0;
             hash.h4[1]=s1;
@@ -495,18 +504,18 @@ uint64_t h8[8];
             hash.h4[7]=s7;
 
       #pragma unroll 16
-      for (int u = 0; u < 16; u ++) 
-            inpHash[u] = hash.h4[u];    
+      for (int u = 0; u < 16; u ++)
+            inpHash[u] = hash.h4[u];
  } // threads
 }
 
 
 void haval256_cpu_init(int thr_id, int threads)
 {
-    
-	
-	cudaMemcpyToSymbol(initVector,c_initVector,sizeof(c_initVector),0, cudaMemcpyHostToDevice);
-	
+
+
+//	cudaMemcpyToSymbol(initVector,c_initVector,sizeof(c_initVector),0, cudaMemcpyHostToDevice);
+
 }
 
 __host__ void haval256_cpu_hash_64(int thr_id, int threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order)
@@ -545,7 +554,7 @@ __host__ void m7_haval256_cpu_hash_120(int thr_id, int threads, uint32_t startNo
 //	dim3 grid(1);
 //	dim3 block(1);
 	size_t shared_size = 0;
-	
+
 	m7_haval256_gpu_hash_120<<<grid, block, shared_size>>>(threads, startNounce, d_outputHash);
 
 	MyStreamSynchronize(NULL, order, thr_id);

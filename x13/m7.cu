@@ -285,38 +285,33 @@ extern "C" int scanhash_m7(int thr_id, uint32_t *pdata,
 	quark_check_cpu_setTarget(ptarget);
 
 	do {
-
 		int order = 0;
 
 
-		  m7_keccak512_cpu_hash(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
-
-		   m7_sha512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], Sha512H[thr_id], order++);
-
+		m7_keccak512_cpu_hash(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
+		m7_sha512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], Sha512H[thr_id], order++);
     cpu_mulT4(0, throughput*tp_coef_f[thr_id], 8, 8, Sha512H[thr_id], KeccakH[thr_id], d_prod0[thr_id],order); //64
-	MyStreamSynchronize(0,order++,thr_id);
+//	MyStreamSynchronize(0,order++,thr_id);
 
-      m7_whirlpool512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
+    m7_whirlpool512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
+		cpu_mulT4(0, throughput*tp_coef_f[thr_id],8, 16, KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order); //128
+//	MyStreamSynchronize(0,order++,thr_id);
 
-	cpu_mulT4(0, throughput*tp_coef_f[thr_id],8, 16, KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order); //128
-	MyStreamSynchronize(0,order++,thr_id);
+		m7_sha256_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
+		cpu_mulT4(0, throughput*tp_coef_f[thr_id], 4, 24, KeccakH[thr_id], d_prod1[thr_id], d_prod0[thr_id],order); //96
+//	MyStreamSynchronize(0,order++,thr_id);
 
-m7_sha256_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
-cpu_mulT4(0, throughput*tp_coef_f[thr_id], 4, 24, KeccakH[thr_id], d_prod1[thr_id], d_prod0[thr_id],order); //96
-	MyStreamSynchronize(0,order++,thr_id);
-
-		   m7_haval256_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
-cpu_mulT4(0, throughput*tp_coef_f[thr_id], 4, 28, KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order);  //112
-	MyStreamSynchronize(0,order++,thr_id);
+		m7_haval256_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
+		cpu_mulT4(0, throughput*tp_coef_f[thr_id], 4, 28, KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order);  //112
+//	MyStreamSynchronize(0,order++,thr_id);
 
 		m7_tiger192_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
-	m7_bigmul_unroll1_cpu(thr_id, throughput*tp_coef_f[thr_id], KeccakH[thr_id], d_prod1[thr_id], d_prod0[thr_id],order);
-	MyStreamSynchronize(0,order++,thr_id);
+		m7_bigmul_unroll1_cpu(thr_id, throughput*tp_coef_f[thr_id], KeccakH[thr_id], d_prod1[thr_id], d_prod0[thr_id],order);
+//	MyStreamSynchronize(0,order++,thr_id);
 
-		 m7_ripemd160_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
-
-	m7_bigmul_unroll2_cpu(thr_id, throughput*tp_coef_f[thr_id], KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order);
-	MyStreamSynchronize(0,order++,thr_id);
+		m7_ripemd160_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
+		m7_bigmul_unroll2_cpu(thr_id, throughput*tp_coef_f[thr_id], KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order);
+//	MyStreamSynchronize(0,order++,thr_id);
 
 
 uint32_t foundNonce = m7_sha256_cpu_hash_300(thr_id, throughput*tp_coef_f[thr_id], pdata[29], NULL, d_prod1[thr_id], order);
