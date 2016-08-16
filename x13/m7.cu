@@ -320,8 +320,8 @@ if  (foundNonce != 0xffffffff) {
 //			m7_hash(vhash64, pdata,foundNonce,0);
 
 //            if( (vhash64[7]<=Htarg )  ) {
-                pdata[29] = foundNonce;
-				*hashes_done = foundNonce - FirstNonce + 1;
+				*hashes_done = pdata[29] - FirstNonce + throughput*tp_coef_f[thr_id];
+        pdata[29] = foundNonce;
 				return 1;
 //			} else {
 //				applog(LOG_INFO, "GPU #%d: result for nonce $%08X does not validate on CPU! vhash64 %08x and htarg %08x", thr_id, foundNonce,vhash64[7],Htarg);
@@ -329,9 +329,10 @@ if  (foundNonce != 0xffffffff) {
 //			}
         } // foundNonce
 		pdata[29] += throughput*tp_coef_f[thr_id];
-*hashes_done +=throughput*tp_coef_f[thr_id];
-	} while (pdata[29] < max_nonce && !work_restart[thr_id].restart);
+		//*hashes_done +=throughput*tp_coef_f[thr_id];
+	//} while (pdata[29] < max_nonce && !work_restart[thr_id].restart);
+	} while (((uint64_t)max_nonce > ((uint64_t)(pdata[29]) + (uint64_t)throughput*tp_coef_f[thr_id])) && !work_restart[thr_id].restart);
 
-//*hashes_done = pdata[29] - FirstNonce + 1;
+	*hashes_done = pdata[29] - FirstNonce;
 	return 0;
 }

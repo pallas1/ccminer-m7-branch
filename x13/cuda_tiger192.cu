@@ -713,22 +713,19 @@ uint64_t h8[8];
 
 
         uint64_t in[8],buf[3];
-		uint64_t in2[8],in3[8];
+		uint64_t in2[8];
+		const uint64_t in3[8] = {0, 0, 0, 0, 0, 0, 0, 0x3d0};
 
-        #pragma unroll 8
+    #pragma unroll 8
 		for (int i=0;i<8;i++) {in2[i]= c_PaddedMessage80[i+8];}
 		uint32_t* Mess = (uint32_t*)in2;
 		Mess[13]=nounce;
 
-        #pragma unroll 7
-		for (int i=0;i<7;i++) {in3[i]=0;}
-		in3[7]=0x3d0;
+		#pragma unroll
+		for (int i=0;i<3;i++) buf[i]=bufo[i];
 
-		#pragma unroll 3
-		for (int i=0;i<3;i++) {buf[i]=bufo[i];}
-
-         TIGER_ROUND_BODY(in2, buf);
-		 TIGER_ROUND_BODY(in3, buf);
+    TIGER_ROUND_BODY(in2, buf);
+		TIGER_ROUND_BODY(in3, buf);
 
 #pragma unroll 3
 for (int i=0;i<3;i++) {outputHash[i*threads+thread]=buf[i];}
