@@ -687,4 +687,15 @@ static __forceinline__ __device__ uint2 shiftr2(uint2 a, int offset)
 ///////////////////////////////////////////////////////////////////////////////////
 
 
+__device__ __inline__ uint2 ROL8(const uint2 a)
+{
+	uint2 result;
+	result.x = __byte_perm(a.x, a.y, 0x2107);
+	result.y = __byte_perm(a.y, a.x, 0x2107);
+
+	return result;
+}
+
+#define ROTR32c(x, n) ((x) >> (n)) | ((x) << (32 - (n)))
+
 #endif // #ifndef CUDA_HELPER_H
