@@ -18,10 +18,9 @@ extern "C"
 
 extern int device_map[8];
 
-
-static uint64_t *d_hash[8];
+//static uint64_t *d_hash[8];
 static uint64_t *KeccakH[8];
-static uint64_t *Sha512H[8];
+//static uint64_t *Sha512H[8];
 static uint64_t *d_prod0[8];
 static uint64_t *d_prod1[8];
 
@@ -52,13 +51,11 @@ static void set_one_if_zero(uint8_t *hash512) {
     hash512[0] = 1;
 }
 */
-//extern uint32_t m7_sha256_cpu_hash_300(int thr_id, int threads, uint32_t startNounce, uint32_t *d_nonceVector, uint32_t *d_hash, int order);
 extern uint32_t m7_sha256_cpu_hash_300(int thr_id, int threads, uint32_t startNounce, uint64_t *d_nonceVector, uint64_t *d_hash, int order);
 
 extern void m7_sha256_setBlock_120(void *data,const void *ptarget);
 extern void m7_sha256_cpu_hash_120(int thr_id, int threads, uint32_t startNounce, uint64_t *d_outputHash, int order);
 extern void m7_sha256_cpu_init(int thr_id, int threads);
-
 
 extern void sha512_cpu_init(int thr_id, int threads);
 extern void sha512_setBlock_120(void *pdata);
@@ -72,7 +69,6 @@ extern void tiger192_cpu_init(int thr_id, int threads);
 extern void tiger192_setBlock_120(void *pdata);
 extern void m7_tiger192_cpu_hash_120(int thr_id, int threads, uint32_t startNounce, uint64_t *d_hash, int order);
 
-
 extern void m7_bigmul_init(int thr_id, int threads);
 extern void m7_bigmul_unroll1_cpu(int thr_id, int threads,uint64_t* Hash1, uint64_t* Hash2,uint64_t *finalHash,int order);
 extern void m7_bigmul_unroll2_cpu(int thr_id, int threads,uint64_t* Hash1, uint64_t* Hash2,uint64_t *finalHash,int order);
@@ -80,7 +76,6 @@ extern void m7_bigmul_unroll2_cpu(int thr_id, int threads,uint64_t* Hash1, uint6
 extern void cpu_mul(int thr_id, int threads, uint32_t alegs, uint32_t blegs, uint64_t *g_a, uint64_t *g_b, uint64_t *g_p, int order);
 extern void cpu_mulT4(int thr_id, int threads, uint32_t alegs, uint32_t blegs, uint64_t *g_a, uint64_t *g_b, uint64_t *g_p, int order);
 extern void mul_init();
-
 
 extern void m7_keccak512_setBlock_120(void *pdata);
 extern void m7_keccak512_cpu_hash(int thr_id, int threads, uint32_t startNounce, uint64_t *d_hash, int order);
@@ -94,11 +89,9 @@ extern void haval256_cpu_init(int thr_id, int threads);
 extern void haval256_setBlock_120(void *data);
 extern void m7_haval256_cpu_hash_120(int thr_id, int threads, uint32_t startNounce, uint64_t *d_outputHash, int order);
 
-
 extern void quark_check_cpu_init(int thr_id, int threads);
 extern void quark_check_cpu_setTarget(const void *ptarget);
 extern uint32_t quark_check_cpu_hash_120(int thr_id, int threads, uint32_t startNounce, uint32_t *d_nonceVector, uint64_t *d_inputHash, int order);
-
 
 
 // m7 Hashfunktion
@@ -231,66 +224,55 @@ if (debug == 1) {
     memcpy(state, hash, 32);
 }
 */
- float tp_coef_f[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+
+
+float tp_coef_f[8] = {1, 1, 1, 1, 1, 1, 1, 1};
 extern bool opt_benchmark;
 
-
-extern "C" int scanhash_m7(int thr_id, uint32_t *pdata,
-    const uint32_t *ptarget, uint32_t max_nonce,
-    unsigned long  *hashes_done)
-{
-
-	if (opt_benchmark)
-		((uint32_t*)ptarget)[7] = 0x0000ff;
-
-
-//	const int throughput = 256*256*16;
+extern "C" int scanhash_m7(int thr_id, uint32_t *pdata, const uint32_t *ptarget, uint32_t max_nonce, unsigned long  *hashes_done) {
+	if (opt_benchmark) ((uint32_t*)ptarget)[7] = 0x0000ff;
 //	const int throughput = 2560*512*1;
 	const int throughput = 256*256*32;
-
 	const uint32_t FirstNonce = pdata[29];
-
 	static bool init[8] = {0,0,0,0,0,0,0,0};
-	if (!init[thr_id])
-	{
 
+	if (!init[thr_id]) {
 		cudaSetDevice(device_map[thr_id]);
 		cudaMalloc(&d_prod0[thr_id],      35 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
 		cudaMalloc(&d_prod1[thr_id],      38 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
 		cudaMalloc(&KeccakH[thr_id],     8 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
-        cudaMalloc(&Sha512H[thr_id],     8 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
+//    cudaMalloc(&Sha512H[thr_id],     8 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
 
-		   m7_sha256_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
-		      sha512_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
+		m7_sha256_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
+		sha512_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
 		m7_keccak512_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
-		    haval256_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
-            tiger192_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
+		haval256_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
+    tiger192_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
 		whirlpool512_cpu_init(thr_id, throughput*tp_coef_f[thr_id],0);
-		   ripemd160_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
-		 quark_check_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
-		       m7_bigmul_init(thr_id, throughput*tp_coef_f[thr_id]);
-			   mul_init();
+		ripemd160_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
+		quark_check_cpu_init(thr_id, throughput*tp_coef_f[thr_id]);
+		m7_bigmul_init(thr_id, throughput*tp_coef_f[thr_id]);
+		mul_init();
 		init[thr_id] = true;
 	}
 
-	const uint32_t Htarg = ptarget[7];
+	//const uint32_t Htarg = ptarget[7];
 
 	whirlpool512_setBlock_120((void*)pdata);
-  	   m7_sha256_setBlock_120((void*)pdata,ptarget);
-	      sha512_setBlock_120((void*)pdata);
-	    haval256_setBlock_120((void*)pdata);
+  m7_sha256_setBlock_120((void*)pdata,ptarget);
+	sha512_setBlock_120((void*)pdata);
+	haval256_setBlock_120((void*)pdata);
 	m7_keccak512_setBlock_120((void*)pdata);
-	   ripemd160_setBlock_120((void*)pdata);
-	    tiger192_setBlock_120((void*)pdata);
+	ripemd160_setBlock_120((void*)pdata);
+	tiger192_setBlock_120((void*)pdata);
 	quark_check_cpu_setTarget(ptarget);
 
 	do {
 		int order = 0;
 
-
 		m7_keccak512_cpu_hash(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
-		m7_sha512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], Sha512H[thr_id], order++);
-    cpu_mulT4(0, throughput*tp_coef_f[thr_id], 8, 8, Sha512H[thr_id], KeccakH[thr_id], d_prod0[thr_id],order); //64
+		m7_sha512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], d_prod1[thr_id], order++);
+    cpu_mulT4(0, throughput*tp_coef_f[thr_id], 8, 8, d_prod1[thr_id], KeccakH[thr_id], d_prod0[thr_id],order); //64
 //	MyStreamSynchronize(0,order++,thr_id);
 
     m7_whirlpool512_cpu_hash_120(thr_id, throughput*tp_coef_f[thr_id], pdata[29], KeccakH[thr_id], order++);
@@ -313,21 +295,19 @@ extern "C" int scanhash_m7(int thr_id, uint32_t *pdata,
 		m7_bigmul_unroll2_cpu(thr_id, throughput*tp_coef_f[thr_id], KeccakH[thr_id], d_prod0[thr_id], d_prod1[thr_id],order);
 //	MyStreamSynchronize(0,order++,thr_id);
 
-
-uint32_t foundNonce = m7_sha256_cpu_hash_300(thr_id, throughput*tp_coef_f[thr_id], pdata[29], NULL, d_prod1[thr_id], order);
-if  (foundNonce != 0xffffffff) {
-			uint32_t vhash64[8];
+		uint32_t foundNonce = m7_sha256_cpu_hash_300(thr_id, throughput*tp_coef_f[thr_id], pdata[29], NULL, d_prod1[thr_id], order);
+		if  (foundNonce != 0xffffffff) {
+//			uint32_t vhash64[8];
 //			m7_hash(vhash64, pdata,foundNonce,0);
-
-//            if( (vhash64[7]<=Htarg )  ) {
-				*hashes_done = pdata[29] - FirstNonce + throughput*tp_coef_f[thr_id];
-        pdata[29] = foundNonce;
-				return 1;
+//      if( (vhash64[7]<=Htarg )  ) {
+			*hashes_done = pdata[29] - FirstNonce + throughput*tp_coef_f[thr_id];
+      pdata[29] = foundNonce;
+			return 1;
 //			} else {
 //				applog(LOG_INFO, "GPU #%d: result for nonce $%08X does not validate on CPU! vhash64 %08x and htarg %08x", thr_id, foundNonce,vhash64[7],Htarg);
-//			m7_hash(vhash64, pdata,foundNonce,1);
+//			  m7_hash(vhash64, pdata,foundNonce,1);
 //			}
-        } // foundNonce
+    }
 		pdata[29] += throughput*tp_coef_f[thr_id];
 		//*hashes_done +=throughput*tp_coef_f[thr_id];
 	//} while (pdata[29] < max_nonce && !work_restart[thr_id].restart);
