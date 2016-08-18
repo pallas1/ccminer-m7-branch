@@ -55,7 +55,7 @@
 extern cudaError_t MyStreamSynchronize(cudaStream_t stream, int situation, int thr_id);
 
 
- __constant__ uint32_t c_PaddedMessage80[32]; // padded message (80 bytes + padding)
+ __constant__ uint32_t c_PaddedMessage80[16]; // padded message (80 bytes + padding)
 //static __constant__ uint32_t gpu_IV[5];
 static __constant__ uint32_t bufo[5];
 static const uint32_t IV[5] = {
@@ -315,18 +315,19 @@ uint64_t h8[8];
 #define F3(x, y, z)   xornot64(x,y,z)
 #define F4(x, y, z)   xandx(z,x,y)
 #define F5(x, y, z)   xornt64(x,y,z)
-        uint32_t in2[16],in3[16];
-        uint32_t in[16],buf[5];
+        uint32_t in2[16];
+        const uint32_t in3[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x3d0, 0};
+        uint32_t buf[5];
+
         #pragma unroll 16
-        for (int i=0;i<16;i++) {if ((i+16)<29)  {in2[i]= c_PaddedMessage80[i+16];}
+        for (int i=0;i<16;i++) {if ((i+16)<29)  {in2[i]= c_PaddedMessage80[i];}
 						   else if ((i+16)==29) {in2[i]= nounce;}
-						   else if ((i+16)==30) {in2[i]= c_PaddedMessage80[i+16];}
+						   else if ((i+16)==30) {in2[i]= c_PaddedMessage80[i];}
 						   else                 {in2[i]= 0;}}
-		#pragma unroll 16
-		for (int i=0;i<16;i++) {in3[i]=0;}
-		                        in3[14]=0x3d0;
+
          #pragma unroll 5
 		 for (int i=0;i<5;i++) {buf[i]=bufo[i];}
+
 		 RIPEMD160_ROUND_BODY(in2, buf);
          RIPEMD160_ROUND_BODY(in3, buf);
 
@@ -358,7 +359,7 @@ __host__ void ripemd160_setBlock_120(void *pdata)
 	memcpy(PaddedMessage, pdata, 122);
 	memset(PaddedMessage+122,ending,1);
 	memset(PaddedMessage+123, 0, 5); //useless
-	cudaMemcpyToSymbol( c_PaddedMessage80, PaddedMessage, 32*sizeof(uint32_t), 0, cudaMemcpyHostToDevice);
+	cudaMemcpyToSymbol( c_PaddedMessage80, PaddedMessage + 64, 16*sizeof(uint32_t), 0, cudaMemcpyHostToDevice);
 
 #undef F1
 #undef F2

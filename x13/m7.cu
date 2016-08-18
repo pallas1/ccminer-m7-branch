@@ -232,12 +232,21 @@ extern bool opt_benchmark;
 extern "C" int scanhash_m7(int thr_id, uint32_t *pdata, const uint32_t *ptarget, uint32_t max_nonce, unsigned long  *hashes_done) {
 	if (opt_benchmark) ((uint32_t*)ptarget)[7] = 0x0000ff;
 //	const int throughput = 2560*512*1;
-	const int throughput = 256*256*32;
+	int throughput = 256*256*48;
 	const uint32_t FirstNonce = pdata[29];
 	static bool init[8] = {0,0,0,0,0,0,0,0};
 
 	if (!init[thr_id]) {
 		cudaSetDevice(device_map[thr_id]);
+		cudaDeviceReset();
+		cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
+		//cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);
+		/*
+		cudaDeviceProp props;
+		cudaGetDeviceProperties(&props, device_map[thr_id]);
+		if (strstr(props.name, "1070") || strstr(props.name, "1080")) throughput = 256*256*96;
+		*/
+
 		cudaMalloc(&d_prod0[thr_id],      35 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
 		cudaMalloc(&d_prod1[thr_id],      38 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
 		cudaMalloc(&KeccakH[thr_id],     8 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
