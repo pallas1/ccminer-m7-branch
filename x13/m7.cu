@@ -232,7 +232,7 @@ extern bool opt_benchmark;
 extern "C" int scanhash_m7(int thr_id, uint32_t *pdata, const uint32_t *ptarget, uint32_t max_nonce, unsigned long  *hashes_done) {
 	if (opt_benchmark) ((uint32_t*)ptarget)[7] = 0x0000ff;
 //	const int throughput = 2560*512*1;
-	int throughput = 256*256*48;
+	int throughput = 256*256*40;
 	const uint32_t FirstNonce = pdata[29];
 	static bool init[8] = {0,0,0,0,0,0,0,0};
 
