@@ -329,7 +329,7 @@ __host__ void m7_bigmul_unroll1_cpu(int thr_id, int threads, uint64_t* Hash1, ui
 	if (compute_version[thr_id]==50) {
 		m7_bigmul_unroll1_gpu_50 << <grid, block, shared_size >> >(threads, Hash1, Hash2, finalHash);
 	}
-	else if (compute_version[thr_id]==52) {
+	else if (compute_version[thr_id]>=52) {
 		m7_bigmul_unroll1_gpu_80 << <grid, block, shared_size >> >(threads, Hash1, Hash2, finalHash);
 	}
 	else {

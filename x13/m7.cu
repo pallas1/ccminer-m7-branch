@@ -236,16 +236,15 @@ extern "C" int scanhash_m7(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 	const uint32_t FirstNonce = pdata[29];
 	static bool init[8] = {0,0,0,0,0,0,0,0};
 
+	cudaDeviceProp props;
+	cudaGetDeviceProperties(&props, device_map[thr_id]);
+	if (strstr(props.name, "1070") || strstr(props.name, "1080")) throughput = 256*256*128;
+
 	if (!init[thr_id]) {
 		cudaSetDevice(device_map[thr_id]);
 		cudaDeviceReset();
 		cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
 		//cudaDeviceSetCacheConfig(cudaFuncCachePreferL1);
-		/*
-		cudaDeviceProp props;
-		cudaGetDeviceProperties(&props, device_map[thr_id]);
-		if (strstr(props.name, "1070") || strstr(props.name, "1080")) throughput = 256*256*96;
-		*/
 
 		cudaMalloc(&d_prod0[thr_id],      35 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
 		cudaMalloc(&d_prod1[thr_id],      38 *sizeof(uint64_t) * throughput*tp_coef_f[thr_id]);
