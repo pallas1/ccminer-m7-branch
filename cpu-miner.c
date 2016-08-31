@@ -817,6 +817,7 @@ static void share_result(int result, const char *reason)
 	pthread_mutex_unlock(&stats_lock);
 
 	sprintf(s, hashrate >= 1e6 ? "%.0f" : "%.2f", 1e-3 * hashrate);
+	/*
 	totalhashrate+=(double) hashrate;
 	totalhashsquare+=pow((double)hashrate,2);
 	hashrow++;
@@ -826,11 +827,18 @@ static void share_result(int result, const char *reason)
 	sprintf(s1, hashrate >= 1e6 ? "%.0f" : "%.2f", 1e-3 * averagehashrate);
 	sprintf(s2, hashrate >= 1e6 ? "%.0f" : "%.2f", 1e-3 * stddev);
 
-		applog(LOG_INFO, "accepted: %lu/%lu (%.2f%%), %s kh/s (%s +/- %s) %s",
+	applog(LOG_INFO, "\x1B[01;37maccepted: %lu/%lu (%.2f%%), %s kh/s (%s +/- %s)\x1B[0m %s",
 				accepted_count,
 				accepted_count + rejected_count,
 				100. * accepted_count / (accepted_count + rejected_count),
-				s,s1,s2, result ? "(yay!!!)" : "(booooo)");
+				s,s1,s2, result ? "\x1B[01;32mYES\x1B[0m" : "\x1B[01;31mNO\x1B[0m");
+	*/
+
+	applog(LOG_INFO, "\x1B[01;37maccepted: %lu/%lu (%.2f%%), %s kh/s\x1B[0m %s",
+				accepted_count,
+				accepted_count + rejected_count,
+				100. * accepted_count / (accepted_count + rejected_count),
+				s, result ? "\x1B[01;32mYES\x1B[0m" : "\x1B[01;31mNO\x1B[0m");
 
 	if (opt_debug && reason)
 		applog(LOG_DEBUG, "DEBUG: reject reason: %s", reason);
@@ -1670,7 +1678,7 @@ static void *miner_thread(void *userdata)
 		if (!opt_quiet) {
 			sprintf(s, thr_hashrates[thr_id] >= 1e6 ? "%.0f" : "%.2f",
 				1e-3 * thr_hashrates[thr_id]);
-			applog(LOG_INFO, "GPU #%d: %s, %s khash/s",
+			applog(LOG_INFO, "\x1B[22;37mGPU #%d: %s, %s khash/s\x1B[0m",
 				device_map[thr_id], device_name[thr_id], s);
 		}
 
