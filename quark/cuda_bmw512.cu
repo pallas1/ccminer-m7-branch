@@ -8,8 +8,8 @@
 #include <memory.h>
 
 // Folgende Definitionen später durch header ersetzen
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
+//////typedef unsigned int uint32_t;
+//typedef unsigned int uint32_t;
 
 // Endian Drehung für 32 Bit Typen
 /*
@@ -69,7 +69,7 @@ static __device__ unsigned long long REPLACE_LOWORD(const unsigned long long &x,
 
 // der Versuch, einen Wrapper für einen aus 32 Bit Registern zusammengesetzten uin64_t Typen zu entferfen...
 #if 1
-typedef unsigned long long uint64_t;
+//typedef unsigned long long uint64_t;
 #else
 typedef class uint64
 {

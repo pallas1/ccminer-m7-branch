@@ -6,9 +6,9 @@
 #include <memory.h>
 
 // Folgende Definitionen später durch header ersetzen
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+//////typedef unsigned int uint32_t;
+//typedef unsigned int uint32_t;
+//typedef unsigned long long uint64_t;
 
 // das Hash Target gegen das wir testen sollen
 __constant__ uint32_t pTarget[8];

@@ -6,9 +6,9 @@
 #include <memory.h>
 
 // Folgende Definitionen später durch header ersetzen
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+//////typedef unsigned int uint32_t;
+//typedef unsigned int uint32_t;
+//typedef unsigned long long uint64_t;
 
 #define SPH_C64(x)    ((uint64_t)(x ## ULL))
 

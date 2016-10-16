@@ -16,9 +16,9 @@ extern int device_map[8];
 extern cudaError_t MyStreamSynchronize(cudaStream_t stream, int situation, int thr_id);
 
 // Folgende Definitionen später durch header ersetzen
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+//////typedef unsigned int uint32_t;
+//typedef unsigned int uint32_t;
+//typedef unsigned long long uint64_t;
 
 // schon in sph_fugue.h definiert
 //#define SPH_C32(x)	((uint32_t)(x ## U))

@@ -61,26 +61,27 @@ ccminer_CPPFLAGS	= -msse2 @LIBCURL_CPPFLAGS@ @OPENMP_CFLAGS@ $(PTHREAD_FLAGS) -f
 # we're now targeting all major compute architectures within one binary.
 # require cuda 6.5 or higher
 .cu.o:
-	$(NVCC) @CFLAGS@ -I . -Xptxas "-v" --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) @CFLAGS@ -I . -Xptxas "-v" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
 
 # Shavite compiles faster with 128 regs
 x11/cuda_x11_shavite512.o: x11/cuda_x11_shavite512.cu
-	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=128 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=128 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
 
 # whirlpool compiles faster with 64 regs
 x13/cuda_whirlpool512.o: x13/cuda_whirlpool512.cu
-	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=64 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=64 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
 
 # whirlpool compiles faster with 64 regs
 x13/cuda_tiger192.o: x13/cuda_tiger192.cu
-	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=64 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=64 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
 
 # ABI requiring code modules
 quark/cuda_quark_compactionTest.o: quark/cuda_quark_compactionTest.cu
-	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
 
 JHA/cuda_jha_compactionTest.o: JHA/cuda_jha_compactionTest.cu
-	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
 
 x13/cuda_mul.o: x13/cuda_mul.cu
-	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  --compiler-bindir /usr/bin/gcc-4.9 -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+	$(NVCC) -I . -I cudpp-2.1/include @CFLAGS@ -Xptxas "-v"  -gencode=arch=compute_50,code=\"sm_50,compute_50\"  -gencode=arch=compute_52,code=\"sm_52,compute_52\"  --maxrregcount=80 --ptxas-options=-v $(JANSSON_INCLUDES) -o $@ -c $<
+

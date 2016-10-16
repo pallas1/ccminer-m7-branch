@@ -8,9 +8,9 @@
 #include <memory.h>
 
 // Folgende Definitionen später durch header ersetzen
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
+//////typedef unsigned int uint32_t;
+//typedef unsigned int uint32_t;
+//typedef unsigned long long uint64_t;
 
 // aus heavy.cu
 extern cudaError_t MyStreamSynchronize(cudaStream_t stream, int situation, int thr_id);

@@ -19,7 +19,7 @@ typedef unsigned long long DataLength;
 #define CUBEHASH_ROUNDS 16 /* this is r for CubeHashr/b */
 #define CUBEHASH_BLOCKBYTES 32 /* this is b for CubeHashr/b */
 
-typedef unsigned int uint32_t; /* must be exactly 32 bits */
+//typedef unsigned int uint32_t; /* must be exactly 32 bits */
 
 #define ROTATEUPWARDS7(a) (((a) << 7) | ((a) >> 25))
 #define ROTATEUPWARDS11(a) (((a) << 11) | ((a) >> 21))
