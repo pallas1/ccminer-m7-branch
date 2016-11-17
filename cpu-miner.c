@@ -560,11 +560,16 @@ static bool gbt_work_decode(const json_t *val, struct work *work)
 		goto out;
 	}
 	curtime = json_integer_value(tmp);
-
+	
+	/*
+	SOLO MINING WORKAROUND
+	The bits field is a decimal number representing the diff, so the following check always fails.
+	Since it's not used in getwork, we can ignore it; getblocktemplate + longpoll doesn't work anyways.
 	if (unlikely(!jobj_binary(val, "bits", &bits, sizeof(bits)))) {
 		applog(LOG_ERR, "JSON invalid bits");
 		goto out;
 	}
+	*/
 
 	/* find count and size of transactions */
 	txa = json_object_get(val, "transactions");
@@ -2294,12 +2299,11 @@ int main(int argc, char *argv[])
 	SYSTEM_INFO sysinfo;
 #endif
 
-	 printf("***** ccMiner for nVidia GPUs by djm34 - M7 version *****\n");
-	 printf("based on original ccMiner by Christian Buchner and Christian H. 2014 ***\n");
-	 printf("Cuda additions Copyright 2014 Christian Buchner, Christian H.\n");
-	 printf("Cuda additions Copyright 2014 DJM34\n\n");
-	 printf("Fixed for newer cuda versions and cards by pallas\n");
-	 printf("BTC donation address: 1H7qC5uHuGX2d5s9Kuw3k7Wm7xMQzL16SN\n\n");
+	printf("ccMiner for nVidia GPUs, M7 version - (C) 2016 pallas\n\n");
+	printf("based on original ccMiner by Christian Buchner and Christian H. 2014\n");
+	printf("Cuda additions Copyright 2014 Christian Buchner, Christian H.\n");
+	printf("Cuda additions and initial M7 support Copyright 2014 djm34\n\n");
+	printf("BTC donation address: 1H7qC5uHuGX2d5s9Kuw3k7Wm7xMQzL16SN\n\n");
 
 	 for (int i = 0; i<8; i++) {tp_coef[i]=-1;}
     opt_difficulty = 1. ;
