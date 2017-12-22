@@ -265,6 +265,7 @@ extern "C" int scanhash_m7(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 	}
 
 	//const uint32_t Htarg = ptarget[7];
+	if (pdata[28] == 0) pdata[28] = random();	// multi-rig solo workaround
 
 	whirlpool512_setBlock_120((void*)pdata);
   m7_sha256_setBlock_120((void*)pdata,ptarget);
